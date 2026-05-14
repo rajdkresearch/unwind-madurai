@@ -36,7 +36,7 @@ export default function Navbar() {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
         scrolled || pathname !== '/'
-          ? 'bg-[#060F08]/95 backdrop-blur-xl border-b border-gold/10 shadow-lg shadow-black/20'
+          ? 'bg-[#071C0A]/95 backdrop-blur-xl border-b border-gold/10 shadow-lg shadow-black/20'
           : 'bg-transparent'
       )}
     >
@@ -99,7 +99,7 @@ export default function Navbar() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className="absolute right-0 mt-2 w-52 bg-[#0A1A0D] border border-gold/20 rounded-xl shadow-2xl p-2"
+                    className="absolute right-0 mt-2 w-52 bg-[#0D2E12] border border-gold/20 rounded-xl shadow-2xl p-2"
                   >
                     <div className="px-3 py-2 border-b border-white/5 mb-1">
                       <p className="text-sm font-semibold text-white truncate">{user.name}</p>
@@ -138,7 +138,7 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden bg-[#060F08]/98 border-t border-gold/10 overflow-hidden"
+            className="md:hidden bg-[#071C0A]/98 border-t border-gold/10 overflow-hidden"
           >
             <div className="px-4 py-4 flex flex-col gap-2">
               {navLinks.map(({ href, label, icon: Icon }) => (

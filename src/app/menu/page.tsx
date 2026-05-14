@@ -28,7 +28,7 @@ function MenuItemCard({ item }: { item: MenuItem }) {
       className="glass-card p-4 flex gap-4 hover:border-gold/30 transition-all"
     >
       {/* Image placeholder */}
-      <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-[#1A1A2E] to-[#081208] shrink-0 overflow-hidden flex items-center justify-center text-3xl border border-white/5 relative">
+      <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-[#1A1A2E] to-[#0A2010] shrink-0 overflow-hidden flex items-center justify-center text-3xl border border-white/5 relative">
         {item.is_veg ? '🥗' : '🍖'}
         {item.is_bestseller && (
           <span className="absolute top-1 left-1 bg-gold text-black text-[8px] font-bold px-1 rounded">BEST</span>
@@ -254,7 +254,7 @@ function MenuContent() {
       {cartCount === 0 && (
         <div className="fixed bottom-6 right-6 z-50">
           <button onClick={() => router.push('/checkout')}
-            className="flex items-center gap-2 px-5 py-3 bg-[#0F2213] border border-gold/20 text-white/60 rounded-xl hover:border-gold/40 hover:text-white transition-all text-sm">
+            className="flex items-center gap-2 px-5 py-3 bg-[#143A1A] border border-gold/20 text-white/60 rounded-xl hover:border-gold/40 hover:text-white transition-all text-sm">
             Skip Food Order <ChevronRight size={14} />
           </button>
         </div>

@@ -3,29 +3,29 @@
 @theme {
   --color-gold: #C9A84C;
   --color-gold-light: #E8D5A3;
-  --color-bg-primary: #060F08;
-  --color-bg-secondary: #0A1A0D;
-  --color-bg-card: #0F2213;
+  --color-bg-primary: #071C0A;
+  --color-bg-secondary: #0D2E12;
+  --color-bg-card: #143A1A;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: #060F08;
+  background-color: #071C0A;
   color: #F0EDE6;
   overflow-x: hidden;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #060F08; }
+::-webkit-scrollbar-track { background: #071C0A; }
 ::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #E8D5A3; }
 
 /* ── Glass card ─────────────────────────────────────────────── */
 .glass-card {
-  background: rgba(12, 28, 16, 0.65);
+  background: rgba(13, 46, 18, 0.70);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(201, 168, 76, 0.18);
@@ -50,7 +50,7 @@ body {
 
 /* ── Inputs ─────────────────────────────────────────────────── */
 .premium-input {
-  background: rgba(10, 26, 13, 0.85);
+  background: rgba(13, 46, 18, 0.85);
   border: 1px solid rgba(201, 168, 76, 0.22);
   border-radius: 0.75rem;
   color: #F0EDE6;
@@ -65,7 +65,7 @@ body {
   box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.09);
 }
 .premium-input::placeholder { color: rgba(240, 237, 230, 0.3); }
-select.premium-input option { background: #0A1A0D; color: #F0EDE6; }
+select.premium-input option { background: #0D2E12; color: #F0EDE6; }
 
 /* ── Scrollbar hide ─────────────────────────────────────────── */
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
