@@ -27,8 +27,8 @@ export default function HomePage() {
         </div>
 
         {/* Gradient overlays */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-[#0A0A0F]/60 via-transparent to-[#0A0A0F]" />
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#0A0A0F]/80 via-transparent to-[#0A0A0F]/40" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-[#060F08]/60 via-transparent to-[#060F08]" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#060F08]/80 via-transparent to-[#060F08]/40" />
 
         {/* Hero Content */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
@@ -101,7 +101,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── ABOUT STRIP ─── */}
-      <section className="py-16 border-y border-gold/10 bg-[#05050A]">
+      <section className="py-16 border-y border-gold/10 bg-[#030A05]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -142,13 +142,13 @@ export default function HomePage() {
               <Link href={`/book?hall=${hall.id}`}
                 className="group block glass-card overflow-hidden hover:border-gold/40 hover:glow-gold-sm transition-all duration-300">
                 {/* Image placeholder with gradient */}
-                <div className="h-44 relative overflow-hidden bg-gradient-to-br from-[#1A1A2E] to-[#0D0D1A]">
+                <div className="h-44 relative overflow-hidden bg-gradient-to-br from-[#1A1A2E] to-[#081208]">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-6xl opacity-20">
                       {hall.id === 'royal-hall' ? '🏛' : hall.id === 'garden-suite' ? '🌿' : hall.id === 'crystal-room' ? '💎' : '🏺'}
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F]/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#060F08]/80 to-transparent" />
                   <div className="absolute top-3 left-3">
                     <span className="px-2 py-0.5 bg-gold/90 text-black text-[10px] font-bold rounded-full">{hall.floor}</span>
                   </div>
@@ -178,7 +178,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="py-24 bg-[#05050A] border-y border-gold/10">
+      <section className="py-24 bg-[#030A05] border-y border-gold/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
@@ -260,7 +260,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── TIME SLOTS PREVIEW ─── */}
-      <section className="py-20 bg-[#05050A] border-t border-gold/10">
+      <section className="py-20 bg-[#030A05] border-t border-gold/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-3 gap-6">
             {[

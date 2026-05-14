@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Hall, SlotType } from '@/types';
 
 interface BookingContextType {
@@ -18,19 +18,42 @@ interface BookingContextType {
 }
 
 const BookingContext = createContext<BookingContextType | null>(null);
+const BOOKING_KEY = 'unwind_booking_draft';
 
-const tomorrow = () => {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
+function tomorrow() {
+  const d = new Date(); d.setDate(d.getDate() + 1);
   return d.toISOString().split('T')[0];
-};
+}
+
+function loadDraft() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const s = sessionStorage.getItem(BOOKING_KEY);
+    return s ? JSON.parse(s) : null;
+  } catch { return null; }
+}
 
 export function BookingProvider({ children }: { children: ReactNode }) {
-  const [selectedHall, setSelectedHall] = useState<Hall | null>(null);
-  const [selectedDate, setSelectedDate] = useState(tomorrow());
-  const [selectedSlot, setSelectedSlot] = useState<SlotType | null>(null);
-  const [guestCount, setGuestCount] = useState(2);
-  const [specialRequests, setSpecialRequests] = useState('');
+  const draft = loadDraft();
+
+  const [selectedHall, setSelectedHall] = useState<Hall | null>(draft?.hall ?? null);
+  const [selectedDate, setSelectedDate] = useState<string>(draft?.date ?? tomorrow());
+  const [selectedSlot, setSelectedSlot] = useState<SlotType | null>(draft?.slot ?? null);
+  const [guestCount, setGuestCount] = useState<number>(draft?.guestCount ?? 2);
+  const [specialRequests, setSpecialRequests] = useState<string>(draft?.specialRequests ?? '');
+
+  // Persist draft to sessionStorage so it survives login redirect
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(BOOKING_KEY, JSON.stringify({
+        hall: selectedHall,
+        date: selectedDate,
+        slot: selectedSlot,
+        guestCount,
+        specialRequests,
+      }));
+    } catch { /* ignore */ }
+  }, [selectedHall, selectedDate, selectedSlot, guestCount, specialRequests]);
 
   const resetBooking = () => {
     setSelectedHall(null);
@@ -38,6 +61,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     setSelectedSlot(null);
     setGuestCount(2);
     setSpecialRequests('');
+    try { sessionStorage.removeItem(BOOKING_KEY); } catch { /* ignore */ }
   };
 
   return (

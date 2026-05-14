@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { CartItem, MenuItem } from '@/types';
 
 interface CartContextType {
@@ -14,16 +14,27 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | null>(null);
+const CART_KEY = 'unwind_cart';
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  // Restore cart from sessionStorage so it survives login redirect
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = sessionStorage.getItem(CART_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+
+  // Persist to sessionStorage on every change
+  useEffect(() => {
+    try { sessionStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* ignore */ }
+  }, [cart]);
 
   const addToCart = useCallback((item: MenuItem) => {
     setCart(prev => {
       const existing = prev.find(c => c.id === item.id);
-      if (existing) {
-        return prev.map(c => c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c);
-      }
+      if (existing) return prev.map(c => c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c);
       return [...prev, { ...item, quantity: 1 }];
     });
   }, []);
@@ -33,14 +44,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateQuantity = useCallback((itemId: string, qty: number) => {
-    if (qty <= 0) {
-      setCart(prev => prev.filter(c => c.id !== itemId));
-      return;
-    }
+    if (qty <= 0) { setCart(prev => prev.filter(c => c.id !== itemId)); return; }
     setCart(prev => prev.map(c => c.id === itemId ? { ...c, quantity: qty } : c));
   }, []);
 
-  const clearCart = useCallback(() => setCart([]), []);
+  const clearCart = useCallback(() => {
+    setCart([]);
+    try { sessionStorage.removeItem(CART_KEY); } catch { /* ignore */ }
+  }, []);
 
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);

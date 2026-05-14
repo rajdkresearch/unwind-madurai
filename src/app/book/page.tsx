@@ -12,7 +12,7 @@ import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Hall, SlotType } from '@/types';
 
-const RoomCanvas = dynamic(() => import('@/components/3d/RoomCanvas'), { ssr: false, loading: () => <div className="w-full h-full bg-[#0A0A0F]" /> });
+const RoomCanvas = dynamic(() => import('@/components/3d/RoomCanvas'), { ssr: false, loading: () => <div className="w-full h-full bg-[#060F08]" /> });
 
 // Min date: tomorrow
 function minDate() {
@@ -212,7 +212,7 @@ function BookingContent() {
                 {/* 3D Room Preview */}
                 <div className="h-48 relative">
                   <RoomCanvas color="#C9A84C" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#12121A] to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A1A0D] to-transparent pointer-events-none" />
                   <div className="absolute bottom-3 left-3 right-3">
                     <h3 className="font-bold text-white text-sm">{selectedHall.name}</h3>
                     <p className="text-white/40 text-xs">{selectedHall.floor} · {selectedHall.area_sqft} sq.ft</p>

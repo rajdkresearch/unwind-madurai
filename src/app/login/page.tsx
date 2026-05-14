@@ -133,7 +133,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 z-0 opacity-50">
         <HeroScene />
       </div>
-      <div className="absolute inset-0 z-10 bg-gradient-to-br from-[#0A0A0F]/90 via-[#0A0A0F]/70 to-[#0A0A0F]/90" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-br from-[#060F08]/90 via-[#060F08]/70 to-[#060F08]/90" />
 
       {/* Suspense wraps useSearchParams */}
       <Suspense fallback={

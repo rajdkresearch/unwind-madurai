@@ -10,7 +10,7 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { timeSlots } from '@/lib/data/halls';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -55,18 +55,18 @@ export default function CheckoutPage() {
         order_total: cartTotal,
       };
 
-      // Save to Supabase (falls back to localStorage if not configured)
-      let savedId = '';
-      try {
-        const { data, error: sbError } = await supabase.from('bookings').insert([bookingData]).select().single();
-        if (sbError) throw sbError;
-        savedId = data.id;
-      } catch {
-        // Fallback: save to localStorage for demo
-        savedId = `BK${Date.now()}`;
-        const stored = JSON.parse(localStorage.getItem('unwind_bookings') || '[]');
-        stored.unshift({ ...bookingData, id: savedId, created_at: new Date().toISOString() });
-        localStorage.setItem('unwind_bookings', JSON.stringify(stored));
+      // Always save to localStorage (instant, works offline)
+      let savedId = `BK${Date.now()}`;
+      const stored = JSON.parse(localStorage.getItem('unwind_bookings') || '[]');
+      stored.unshift({ ...bookingData, id: savedId, created_at: new Date().toISOString() });
+      localStorage.setItem('unwind_bookings', JSON.stringify(stored));
+
+      // Also save to Supabase if configured
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error: sbError } = await supabase.from('bookings').insert([bookingData]).select().single();
+          if (!sbError && data) savedId = data.id;
+        } catch { /* localStorage already saved */ }
       }
 
       setBookingId(savedId);

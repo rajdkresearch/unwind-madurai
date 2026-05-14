@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CalendarDays, Users, Clock, Check, X, AlertCircle, Loader2, ShoppingCart, RefreshCw, Plus } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -132,23 +132,27 @@ export default function MyBookingsPage() {
     if (!user) return;
     setLoading(true);
 
-    try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+    // Always load from localStorage first (instant)
+    const stored: BookingRecord[] = JSON.parse(localStorage.getItem('unwind_bookings') || '[]');
+    const localBookings = stored.filter(b => !b.user_id || b.user_id === user.id);
+    setBookings(localBookings);
 
-      if (error) throw error;
-      setBookings(data || []);
-    } catch {
-      // Fallback: load from localStorage
-      const stored = JSON.parse(localStorage.getItem('unwind_bookings') || '[]');
-      const userBookings = stored.filter((b: BookingRecord) => b.user_id === user.id || !b.user_id);
-      setBookings(userBookings);
-    } finally {
-      setLoading(false);
+    // Then try Supabase if configured
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          setBookings(data);
+        }
+      } catch { /* keep localStorage results */ }
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -160,13 +164,13 @@ export default function MyBookingsPage() {
 
   const cancelBooking = async (id: string) => {
     if (!confirm('Are you sure you want to cancel this booking?')) return;
-    try {
-      await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', id);
-    } catch {
-      // Fallback: update localStorage
-      const stored = JSON.parse(localStorage.getItem('unwind_bookings') || '[]');
-      const updated = stored.map((b: BookingRecord) => b.id === id ? { ...b, status: 'cancelled' } : b);
-      localStorage.setItem('unwind_bookings', JSON.stringify(updated));
+    // Update localStorage
+    const stored = JSON.parse(localStorage.getItem('unwind_bookings') || '[]');
+    const updated = stored.map((b: BookingRecord) => b.id === id ? { ...b, status: 'cancelled' } : b);
+    localStorage.setItem('unwind_bookings', JSON.stringify(updated));
+    // Update Supabase if configured
+    if (isSupabaseConfigured) {
+      try { await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', id); } catch { /* ignore */ }
     }
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'cancelled' } : b));
   };

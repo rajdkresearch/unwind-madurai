@@ -22,7 +22,7 @@ function RoomModel({ color = '#C9A84C' }: { color?: string }) {
         </Plane>
         {/* Back wall */}
         <Plane args={[4, 2.5]} position={[0, 0.05, -2]}>
-          <meshStandardMaterial color="#12121A" />
+          <meshStandardMaterial color="#0A1A0D" />
         </Plane>
         {/* Left wall */}
         <Plane args={[4, 2.5]} rotation={[0, Math.PI / 2, 0]} position={[-2, 0.05, 0]}>
@@ -42,10 +42,10 @@ function RoomModel({ color = '#C9A84C' }: { color?: string }) {
         {[-1.4, 1.4].map((x, i) => (
           <group key={i} position={[x, -0.7, 0]}>
             <Box args={[0.6, 0.08, 0.6]}>
-              <meshStandardMaterial color="#1E1E2E" roughness={0.6} />
+              <meshStandardMaterial color="#0F2213" roughness={0.6} />
             </Box>
             <Box args={[0.6, 0.6, 0.08]} position={[0, 0.35, -0.26]}>
-              <meshStandardMaterial color="#1E1E2E" roughness={0.6} />
+              <meshStandardMaterial color="#0F2213" roughness={0.6} />
             </Box>
           </group>
         ))}
