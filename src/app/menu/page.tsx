@@ -77,7 +77,7 @@ function MenuItemCard({ item }: { item: MenuItem }) {
 function RestaurantCard({ restaurant, selected, onClick }: { restaurant: Restaurant; selected: boolean; onClick: () => void }) {
   const icons: Record<string, string> = {
     'South Indian': '🥘', 'Chettinad': '🌶', 'Traditional Tamil': '🍲',
-    'Pure Vegetarian': '🥗', 'Biriyani & Kebabs': '🍚',
+    'Pure Vegetarian': '🥗', 'Biriyani & Kebabs': '🍚', 'Multi-Cuisine': '🍴',
   };
   return (
     <button onClick={onClick}
@@ -153,7 +153,7 @@ function MenuContent() {
         {/* Restaurant Sidebar */}
         <div className="lg:col-span-1">
           <h3 className="text-xs font-semibold text-white/40 tracking-widest uppercase mb-4">Choose Restaurant</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3 lg:max-h-[80vh] lg:overflow-y-auto lg:pr-1 scrollbar-hide">
             {restaurants.map(r => (
               <RestaurantCard key={r.id} restaurant={r} selected={activeRestaurantId === r.id} onClick={() => { setActiveRestaurantId(r.id); setActiveCategory('All'); setSearch(''); }} />
             ))}
@@ -165,7 +165,7 @@ function MenuContent() {
           {/* Restaurant Header */}
           <div className="glass-card p-5 mb-6 flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl">
-              {currentRestaurant.cuisine_type === 'South Indian' ? '🥘' : currentRestaurant.cuisine_type === 'Chettinad' ? '🌶' : currentRestaurant.cuisine_type === 'Biriyani & Kebabs' ? '🍚' : currentRestaurant.is_veg ? '🥗' : '🍲'}
+              {({'South Indian':'🥘','Chettinad':'🌶','Biriyani & Kebabs':'🍚','Multi-Cuisine':'🍴','Pure Vegetarian':'🥗'} as Record<string,string>)[currentRestaurant.cuisine_type] || (currentRestaurant.is_veg ? '🥗' : '🍲')}
             </div>
             <div className="flex-1">
               <h2 className="font-bold text-white text-lg">{currentRestaurant.name}</h2>

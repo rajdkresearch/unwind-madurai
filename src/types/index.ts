@@ -65,7 +65,7 @@ export interface MenuItem {
   description: string;
   price: number;
   category: string;
-  image: string;
+  image?: string;
   is_veg: boolean;
   is_bestseller?: boolean;
   spice_level?: 'mild' | 'medium' | 'hot';
