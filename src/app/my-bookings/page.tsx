@@ -152,10 +152,10 @@ export default function MyBookingsPage() {
   };
 
   useEffect(() => {
-    if (!authLoading) {
-      if (!user) { router.push('/login?redirect=/my-bookings'); return; }
+    if (!authLoading && user) {
       loadBookings();
     }
+    if (!authLoading) setLoading(false);
   }, [user, authLoading]);
 
   const cancelBooking = async (id: string) => {
@@ -178,10 +178,36 @@ export default function MyBookingsPage() {
     return true;
   });
 
-  if (authLoading || (!user && loading)) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-gold" />
+      </div>
+    );
+  }
+
+  // Not signed in — show friendly prompt instead of redirecting
+  if (!user) {
+    return (
+      <div className="min-h-screen pt-24 flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="w-20 h-20 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center text-4xl mx-auto mb-6">
+            📅
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">View Your Bookings</h2>
+          <p className="text-white/40 text-sm mb-8 leading-relaxed">
+            Sign in to see your upcoming reservations, past visits, and manage your bookings at Unwind Madurai.
+          </p>
+          <Link
+            href="/login?redirect=/my-bookings"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-gold text-black font-bold rounded-xl hover:bg-gold/90 transition-all"
+          >
+            Sign In to View Bookings
+          </Link>
+          <p className="mt-4 text-white/25 text-xs">
+            No account needed — sign in with Google in seconds
+          </p>
+        </div>
       </div>
     );
   }

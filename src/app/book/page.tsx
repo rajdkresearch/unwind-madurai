@@ -41,7 +41,6 @@ function BookingContent() {
   const canProceedToStep3 = !!selectedDate && !!selectedSlot && guestCount > 0;
 
   const handleProceedToMenu = () => {
-    if (!user) { router.push('/login?redirect=/book'); return; }
     if (!selectedHall || !selectedDate || !selectedSlot) return;
     router.push('/menu');
   };
@@ -197,7 +196,7 @@ function BookingContent() {
                     disabled={!selectedHall || (guestCount > (selectedHall?.capacity || 50))}
                     className="flex-1 py-3.5 bg-gold text-black font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
                   >
-                    {user ? 'Proceed to Order Food →' : 'Sign In to Continue →'}
+                    Proceed to Order Food →
                   </button>
                 </div>
               </motion.div>
