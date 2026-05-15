@@ -2,9 +2,8 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, ChevronRight, Info, Check, Loader2 } from 'lucide-react';
+import { Users, ChevronRight, Info, Check, Loader2, CalendarDays, Clock, ArrowRight, Lock } from 'lucide-react';
 import { halls, timeSlots } from '@/lib/data/halls';
 import { useBooking } from '@/components/providers/BookingProvider';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -12,33 +11,60 @@ import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Hall, SlotType } from '@/types';
 
-const RoomCanvas = dynamic(() => import('@/components/3d/RoomCanvas'), { ssr: false, loading: () => <div className="w-full h-full bg-[#FBF8F3]" /> });
-
-// Min date: tomorrow
 function minDate() {
   const d = new Date(); d.setDate(d.getDate() + 1);
   return d.toISOString().split('T')[0];
+}
+
+/** Returns hall IDs already booked for the given date + slot (from localStorage) */
+function getBookedHallIds(date: string, slot: string): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const bookings = JSON.parse(localStorage.getItem('unwind_bookings') || '[]');
+    return bookings
+      .filter((b: { date: string; slot_type: string; status: string; hall_id: string }) =>
+        b.date === date && b.slot_type === slot && b.status !== 'cancelled')
+      .map((b: { hall_id: string }) => b.hall_id);
+  } catch { return []; }
 }
 
 function BookingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
-  const { selectedHall, selectedDate, selectedSlot, guestCount, specialRequests,
-    setSelectedHall, setSelectedDate, setSelectedSlot, setGuestCount, setSpecialRequests } = useBooking();
+  const {
+    selectedHall, selectedDate, selectedSlot, guestCount, specialRequests,
+    setSelectedHall, setSelectedDate, setSelectedSlot, setGuestCount, setSpecialRequests,
+  } = useBooking();
 
+  // New step order: 1 = Date & Slot, 2 = Choose Space, 3 = Guest Details
   const [step, setStep] = useState(1);
+  const [bookedHallIds, setBookedHallIds] = useState<string[]>([]);
+
   const preSelectedHallId = searchParams.get('hall');
 
+  // Pre-highlight hall from URL (but still start at step 1)
   useEffect(() => {
     if (preSelectedHallId) {
       const hall = halls.find(h => h.id === preSelectedHallId);
-      if (hall) { setSelectedHall(hall); setStep(2); }
+      if (hall) setSelectedHall(hall);
     }
   }, [preSelectedHallId, setSelectedHall]);
 
-  const canProceedToStep2 = !!selectedHall;
-  const canProceedToStep3 = !!selectedDate && !!selectedSlot && guestCount > 0;
+  // Refresh availability whenever date/slot changes
+  useEffect(() => {
+    if (selectedDate && selectedSlot) {
+      setBookedHallIds(getBookedHallIds(selectedDate, selectedSlot));
+    }
+  }, [selectedDate, selectedSlot]);
+
+  const canProceedToStep2 = !!selectedDate && !!selectedSlot;
+
+  const handleSelectHall = (hall: Hall) => {
+    setSelectedHall(hall);
+    // Auto-advance to guest details
+    setStep(3);
+  };
 
   const handleProceedToMenu = () => {
     if (!selectedHall || !selectedDate || !selectedSlot) return;
@@ -46,6 +72,7 @@ function BookingContent() {
   };
 
   const slotTime = timeSlots.find(s => s.id === selectedSlot)?.time || '';
+  const stepLabels = ['Date & Slot', 'Choose Space', 'Guest Details'];
 
   return (
     <div className="min-h-screen bg-white pt-28 pb-16 max-w-7xl mx-auto px-4 sm:px-6">
@@ -53,20 +80,25 @@ function BookingContent() {
       <div className="mb-10">
         <div className="text-gold text-xs font-semibold tracking-[0.3em] uppercase mb-3">Book a Space</div>
         <h1 className="text-4xl font-bold text-[#1A1A1A]">Reserve Your Experience</h1>
-        <p className="text-[#6B6460] mt-2">Select your space, date, and time slot</p>
+        <p className="text-[#6B6460] mt-2">Pick your date and time — we'll show what's available</p>
       </div>
 
       {/* Step Indicator */}
       <div className="flex items-center gap-2 mb-10">
-        {['Choose Space', 'Date & Slot', 'Guest Details'].map((label, i) => {
+        {stepLabels.map((label, i) => {
           const s = i + 1;
           return (
             <div key={label} className="flex items-center gap-2">
-              <div className={cn('flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
-                step === s ? 'bg-gold text-white' : step > s ? 'bg-gold/20 text-gold' : 'bg-gray-100 text-gray-400')}>
+              <button
+                onClick={() => s < step && setStep(s)}
+                className={cn('flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
+                  step === s ? 'bg-gold text-white' :
+                  step > s ? 'bg-gold/15 text-gold cursor-pointer hover:bg-gold/25' :
+                  'bg-gray-100 text-gray-400 cursor-default')}
+              >
                 {step > s ? <Check size={12} /> : <span>{s}</span>}
                 <span className="hidden sm:inline">{label}</span>
-              </div>
+              </button>
               {i < 2 && <ChevronRight size={14} className="text-gray-300" />}
             </div>
           );
@@ -77,34 +109,14 @@ function BookingContent() {
         {/* Main Content */}
         <div className="lg:col-span-2">
           <AnimatePresence mode="wait">
-            {/* ── Step 1: Choose Hall ── */}
+
+            {/* ── Step 1: Date & Time Slot ── */}
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                <div className="grid sm:grid-cols-2 gap-5">
-                  {halls.map(hall => (
-                    <HallCard
-                      key={hall.id}
-                      hall={hall}
-                      selected={selectedHall?.id === hall.id}
-                      onSelect={() => { setSelectedHall(hall); }}
-                    />
-                  ))}
-                </div>
-                <button
-                  onClick={() => setStep(2)}
-                  disabled={!canProceedToStep2}
-                  className="mt-8 w-full py-3.5 bg-gold text-white font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
-                >
-                  Continue to Date & Slot
-                </button>
-              </motion.div>
-            )}
-
-            {/* ── Step 2: Date & Slot ── */}
-            {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                 <div className="glass-card p-6 mb-6">
-                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-3">Select Date</label>
+                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-3 flex items-center gap-2">
+                    <CalendarDays size={15} className="text-gold" /> Select Date
+                  </label>
                   <input
                     type="date"
                     min={minDate()}
@@ -115,7 +127,9 @@ function BookingContent() {
                 </div>
 
                 <div className="glass-card p-6 mb-6">
-                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-4">Select Time Slot</label>
+                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-4 flex items-center gap-2">
+                    <Clock size={15} className="text-gold" /> Select Time Slot
+                  </label>
                   <div className="grid grid-cols-3 gap-4">
                     {timeSlots.map(slot => (
                       <button
@@ -127,31 +141,80 @@ function BookingContent() {
                             : 'border-[#EDE8DF] bg-white hover:border-gold/40')}
                       >
                         <div className="text-2xl mb-2">{slot.icon}</div>
-                        <div className={cn('font-bold text-sm', selectedSlot === slot.id ? 'text-gold' : 'text-[#1A1A1A]')}>{slot.label}</div>
+                        <div className={cn('font-bold text-sm', selectedSlot === slot.id ? 'text-gold' : 'text-[#1A1A1A]')}>
+                          {slot.label}
+                        </div>
                         <div className="text-[#9C948E] text-xs mt-1">{slot.time}</div>
+                        <div className="text-[#9C948E] text-[10px] mt-0.5 line-clamp-1">{slot.description}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <button onClick={() => setStep(1)} className="px-5 py-3 border border-[#EDE8DF] text-[#6B6460] rounded-xl hover:bg-gray-50 transition-all text-sm">
-                    Back
-                  </button>
-                  <button
-                    onClick={() => setStep(3)}
-                    disabled={!canProceedToStep3}
-                    className="flex-1 py-3.5 bg-gold text-white font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
-                  >
-                    Continue to Guest Details
+                <button
+                  onClick={() => setStep(2)}
+                  disabled={!canProceedToStep2}
+                  className="w-full py-3.5 bg-gold text-white font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
+                >
+                  Find Available Spaces <ArrowRight size={16} />
+                </button>
+              </motion.div>
+            )}
+
+            {/* ── Step 2: Choose Hall (with availability) ── */}
+            {step === 2 && (
+              <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <p className="text-sm font-semibold text-[#1A1A1A]">Available spaces for</p>
+                    <p className="text-gold font-bold">
+                      {selectedDate ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'long' }) : ''} · {timeSlots.find(s => s.id === selectedSlot)?.label}
+                    </p>
+                  </div>
+                  <button onClick={() => setStep(1)} className="text-xs text-[#6B6460] hover:text-gold transition-colors underline underline-offset-2">
+                    Change date/slot
                   </button>
                 </div>
+
+                <div className="grid sm:grid-cols-2 gap-5">
+                  {halls.map(hall => {
+                    const isBooked = bookedHallIds.includes(hall.id);
+                    return (
+                      <HallCard
+                        key={hall.id}
+                        hall={hall}
+                        selected={selectedHall?.id === hall.id}
+                        unavailable={isBooked}
+                        onSelect={() => !isBooked && handleSelectHall(hall)}
+                      />
+                    );
+                  })}
+                </div>
+
+                {bookedHallIds.length > 0 && (
+                  <p className="mt-4 text-xs text-[#9C948E] flex items-center gap-1.5">
+                    <Lock size={10} /> Greyed-out spaces are already booked for this slot.
+                  </p>
+                )}
               </motion.div>
             )}
 
             {/* ── Step 3: Guest Details ── */}
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                {/* Selected hall preview */}
+                {selectedHall && (
+                  <div className="glass-card overflow-hidden mb-6 flex items-center gap-4 p-4">
+                    <img src={selectedHall.images[0]} alt={selectedHall.name} className="w-16 h-16 rounded-xl object-cover shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gold font-semibold uppercase tracking-wider">Selected Space</p>
+                      <h3 className="font-bold text-[#1A1A1A] text-sm">{selectedHall.name}</h3>
+                      <p className="text-[#9C948E] text-xs">{selectedHall.floor} · Up to {selectedHall.capacity} guests</p>
+                    </div>
+                    <button onClick={() => setStep(2)} className="text-xs text-gold hover:underline shrink-0">Change</button>
+                  </div>
+                )}
+
                 <div className="glass-card p-6 mb-6">
                   <label className="block text-sm font-semibold text-[#1A1A1A] mb-3">Number of Guests</label>
                   <div className="flex items-center gap-4">
@@ -177,7 +240,9 @@ function BookingContent() {
                 </div>
 
                 <div className="glass-card p-6 mb-6">
-                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-3">Special Requests <span className="text-[#9C948E] font-normal">(optional)</span></label>
+                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-3">
+                    Special Requests <span className="text-[#9C948E] font-normal">(optional)</span>
+                  </label>
                   <textarea
                     value={specialRequests}
                     onChange={e => setSpecialRequests(e.target.value)}
@@ -193,7 +258,7 @@ function BookingContent() {
                   </button>
                   <button
                     onClick={handleProceedToMenu}
-                    disabled={!selectedHall || (guestCount > (selectedHall?.capacity || 50))}
+                    disabled={!selectedHall || guestCount < 1 || guestCount > (selectedHall?.capacity || 50)}
                     className="flex-1 py-3.5 bg-gold text-white font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
                   >
                     Proceed to Order Food →
@@ -207,62 +272,70 @@ function BookingContent() {
         {/* Sidebar Summary */}
         <div className="lg:col-span-1">
           <div className="sticky top-28">
-            {selectedHall ? (
-              <div className="glass-card overflow-hidden">
-                {/* 3D Room Preview */}
-                <div className="h-48 relative">
-                  <RoomCanvas color="#C9A84C" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="font-bold text-white text-sm drop-shadow">{selectedHall.name}</h3>
-                    <p className="text-white/70 text-xs drop-shadow">{selectedHall.floor} · {selectedHall.area_sqft} sq.ft</p>
+            <div className="glass-card overflow-hidden">
+              <div className="p-5 border-b border-[#EDE8DF]">
+                <h3 className="font-bold text-[#1A1A1A] text-sm mb-4">Booking Summary</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#9C948E]">Date</span>
+                    <span className={cn('font-medium', selectedDate ? 'text-[#1A1A1A]' : 'text-[#D0CCC8]')}>
+                      {selectedDate
+                        ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#9C948E]">Slot</span>
+                    <span className={cn('font-medium', selectedSlot ? 'text-[#1A1A1A]' : 'text-[#D0CCC8]')}>
+                      {selectedSlot ? `${timeSlots.find(s => s.id === selectedSlot)?.label} · ${slotTime}` : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#9C948E]">Space</span>
+                    <span className={cn('font-medium', selectedHall ? 'text-[#1A1A1A]' : 'text-[#D0CCC8]')}>
+                      {selectedHall?.name ?? '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#9C948E]">Guests</span>
+                    <span className="font-medium text-[#1A1A1A]">{guestCount} persons</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="p-5 space-y-4">
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedHall.amenities.slice(0, 4).map(a => (
-                      <span key={a} className="px-2 py-0.5 bg-gold/10 text-gold text-[10px] rounded-full border border-gold/20">{a}</span>
-                    ))}
-                    {selectedHall.amenities.length > 4 && (
-                      <span className="px-2 py-0.5 bg-gray-50 text-[#9C948E] text-[10px] rounded-full border border-[#EDE8DF]">+{selectedHall.amenities.length - 4}</span>
-                    )}
-                  </div>
-
-                  <div className="border-t border-[#EDE8DF] pt-4 space-y-2.5">
-                    {selectedDate && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#9C948E]">Date</span>
-                        <span className="text-[#1A1A1A] font-medium">{new Date(selectedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                      </div>
-                    )}
-                    {selectedSlot && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#9C948E]">Slot</span>
-                        <span className="text-[#1A1A1A] font-medium">{timeSlots.find(s => s.id === selectedSlot)?.label} · {slotTime}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#9C948E]">Guests</span>
-                      <span className="text-[#1A1A1A] font-medium">{guestCount} persons</span>
+              {selectedHall ? (
+                <>
+                  <div className="h-36 relative overflow-hidden">
+                    <img src={selectedHall.images[0]} alt={selectedHall.name} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <p className="text-white font-bold text-sm drop-shadow">{selectedHall.name}</p>
+                      <p className="text-white/70 text-xs">{selectedHall.floor} · {selectedHall.area_sqft} sq.ft</p>
                     </div>
                   </div>
-
-                  <div className="border-t border-[#EDE8DF] pt-4">
-                    <div className="flex justify-between">
+                  <div className="p-5">
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {selectedHall.amenities.slice(0, 4).map(a => (
+                        <span key={a} className="px-2 py-0.5 bg-gold/10 text-gold text-[10px] rounded-full border border-gold/20">{a}</span>
+                      ))}
+                      {selectedHall.amenities.length > 4 && (
+                        <span className="px-2 py-0.5 bg-gray-50 text-[#9C948E] text-[10px] rounded-full border border-[#EDE8DF]">+{selectedHall.amenities.length - 4}</span>
+                      )}
+                    </div>
+                    <div className="flex justify-between items-center border-t border-[#EDE8DF] pt-4">
                       <span className="text-[#6B6460] text-sm">Hall charge</span>
                       <span className="text-gold font-bold">{formatCurrency(selectedHall.price_per_slot)}</span>
                     </div>
                     <p className="text-[#9C948E] text-xs mt-1">+ Food order total (next step)</p>
                   </div>
+                </>
+              ) : (
+                <div className="p-8 text-center">
+                  <div className="text-4xl mb-3">🏛</div>
+                  <p className="text-[#9C948E] text-sm">Select date & slot, then choose your space</p>
                 </div>
-              </div>
-            ) : (
-              <div className="glass-card p-8 text-center">
-                <div className="text-4xl mb-4">🏛</div>
-                <p className="text-[#9C948E] text-sm">Select a space to see details and pricing</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -270,24 +343,37 @@ function BookingContent() {
   );
 }
 
-function HallCard({ hall, selected, onSelect }: { hall: Hall; selected: boolean; onSelect: () => void }) {
+function HallCard({ hall, selected, unavailable, onSelect }: {
+  hall: Hall; selected: boolean; unavailable: boolean; onSelect: () => void;
+}) {
   return (
     <button
       onClick={onSelect}
-      className={cn('glass-card text-left overflow-hidden transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]',
-        selected ? 'border-gold shadow-md shadow-gold/10' : 'hover:border-gold/40')}
+      disabled={unavailable}
+      className={cn(
+        'glass-card text-left overflow-hidden transition-all duration-200 w-full',
+        unavailable
+          ? 'opacity-50 cursor-not-allowed grayscale'
+          : selected
+          ? 'border-gold shadow-md shadow-gold/10 scale-[1.02]'
+          : 'hover:border-gold/40 hover:scale-[1.02] active:scale-[0.98]'
+      )}
     >
-      {/* Hall photo */}
       <div className="relative h-36 overflow-hidden">
-        <img
-          src={hall.images[0]}
-          alt={hall.name}
-          className="w-full h-full object-cover transition-transform duration-500"
-        />
+        <img src={hall.images[0]} alt={hall.name} className="w-full h-full object-cover transition-transform duration-500" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        {selected && (
+        {unavailable ? (
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-black/60 rounded-full">
+            <Lock size={9} className="text-white" />
+            <span className="text-white text-[9px] font-semibold">Booked</span>
+          </div>
+        ) : selected ? (
           <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gold flex items-center justify-center">
             <Check size={12} className="text-white" />
+          </div>
+        ) : (
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <ArrowRight size={14} className="text-white" />
           </div>
         )}
         <span className="absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 bg-gold text-white rounded-full">{hall.floor}</span>
@@ -297,7 +383,9 @@ function HallCard({ hall, selected, onSelect }: { hall: Hall; selected: boolean;
         <p className="text-[#9C948E] text-xs mb-3 line-clamp-2">{hall.description}</p>
         <div className="flex items-center justify-between text-xs">
           <span className="text-[#6B6460]"><Users size={10} className="inline mr-1" />Up to {hall.capacity}</span>
-          <span className="text-gold font-bold">{formatCurrency(hall.price_per_slot)}/slot</span>
+          {unavailable
+            ? <span className="text-red-400 font-semibold">Unavailable</span>
+            : <span className="text-gold font-bold">{formatCurrency(hall.price_per_slot)}/slot</span>}
         </div>
       </div>
     </button>

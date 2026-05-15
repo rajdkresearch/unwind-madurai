@@ -27,11 +27,17 @@ function MenuItemCard({ item }: { item: MenuItem }) {
       animate={{ opacity: 1, y: 0 }}
       className="glass-card p-4 flex gap-4 hover:border-gold/40 transition-all"
     >
-      {/* Image placeholder */}
-      <div className="w-24 h-24 rounded-xl bg-[#FBF8F3] shrink-0 overflow-hidden flex items-center justify-center text-3xl border border-[#EDE8DF] relative">
-        {item.is_veg ? '🥗' : '🍖'}
+      {/* Dish image */}
+      <div className="w-24 h-24 rounded-xl shrink-0 overflow-hidden border border-[#EDE8DF] relative">
+        {item.image ? (
+          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-[#FBF8F3] flex items-center justify-center text-3xl">
+            {item.is_veg ? '🥗' : '🍖'}
+          </div>
+        )}
         {item.is_bestseller && (
-          <span className="absolute top-1 left-1 bg-gold text-white text-[8px] font-bold px-1 rounded">BEST</span>
+          <span className="absolute top-1 left-1 bg-gold text-white text-[8px] font-bold px-1.5 py-0.5 rounded">BEST</span>
         )}
       </div>
 
