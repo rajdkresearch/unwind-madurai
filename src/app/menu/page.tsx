@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Clock, Leaf, Flame, ShoppingCart, Plus, Minus, Search, ChevronRight, Loader2, ArrowLeft } from 'lucide-react';
@@ -111,6 +111,7 @@ function MenuContent() {
   const { cart, cartTotal, cartCount } = useCart();
   const { selectedHall } = useBooking();
 
+  const menuAreaRef = useRef<HTMLDivElement>(null);
   const defaultRestaurantId = searchParams.get('restaurant') || restaurants[0].id;
   const [activeRestaurantId, setActiveRestaurantId] = useState(defaultRestaurantId);
   const [search, setSearch] = useState('');
@@ -163,13 +164,13 @@ function MenuContent() {
           <h3 className="text-xs font-semibold text-[#9C948E] tracking-widest uppercase mb-4">Choose Restaurant</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3 lg:max-h-[80vh] lg:overflow-y-auto lg:pr-1 scrollbar-hide">
             {restaurants.map(r => (
-              <RestaurantCard key={r.id} restaurant={r} selected={activeRestaurantId === r.id} onClick={() => { setActiveRestaurantId(r.id); setActiveCategory('All'); setSearch(''); }} />
+              <RestaurantCard key={r.id} restaurant={r} selected={activeRestaurantId === r.id} onClick={() => { setActiveRestaurantId(r.id); setActiveCategory('All'); setSearch(''); menuAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} />
             ))}
           </div>
         </div>
 
         {/* Menu Area */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3" ref={menuAreaRef}>
           {/* Restaurant Header */}
           <div className="glass-card p-5 mb-6 flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl">
