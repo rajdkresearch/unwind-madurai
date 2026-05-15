@@ -269,7 +269,8 @@ function BookingContent() {
           </AnimatePresence>
         </div>
 
-        {/* Sidebar Summary */}
+        {/* Sidebar Summary — only shown on the last step */}
+        {step === 3 && (
         <div className="lg:col-span-1">
           <div className="sticky top-28">
             <div className="glass-card overflow-hidden">
@@ -338,6 +339,7 @@ function BookingContent() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );
