@@ -38,10 +38,10 @@ export default function CallbackPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#071C0A]">
+    <div className="min-h-screen flex items-center justify-center bg-[#FBF8F3]">
       <div className="text-center">
         <Loader2 size={40} className="animate-spin text-gold mx-auto mb-4" />
-        <p className="text-white/50 text-sm">Signing you in...</p>
+        <p className="text-[#6B6460] text-sm">Signing you in...</p>
       </div>
     </div>
   );

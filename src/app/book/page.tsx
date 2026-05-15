@@ -12,7 +12,7 @@ import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Hall, SlotType } from '@/types';
 
-const RoomCanvas = dynamic(() => import('@/components/3d/RoomCanvas'), { ssr: false, loading: () => <div className="w-full h-full bg-[#071C0A]" /> });
+const RoomCanvas = dynamic(() => import('@/components/3d/RoomCanvas'), { ssr: false, loading: () => <div className="w-full h-full bg-[#FBF8F3]" /> });
 
 // Min date: tomorrow
 function minDate() {
@@ -48,12 +48,12 @@ function BookingContent() {
   const slotTime = timeSlots.find(s => s.id === selectedSlot)?.time || '';
 
   return (
-    <div className="min-h-screen pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6">
+    <div className="min-h-screen bg-white pt-28 pb-16 max-w-7xl mx-auto px-4 sm:px-6">
       {/* Header */}
       <div className="mb-10">
         <div className="text-gold text-xs font-semibold tracking-[0.3em] uppercase mb-3">Book a Space</div>
-        <h1 className="text-4xl font-bold">Reserve Your Experience</h1>
-        <p className="text-white/40 mt-2">Select your space, date, and time slot</p>
+        <h1 className="text-4xl font-bold text-[#1A1A1A]">Reserve Your Experience</h1>
+        <p className="text-[#6B6460] mt-2">Select your space, date, and time slot</p>
       </div>
 
       {/* Step Indicator */}
@@ -63,11 +63,11 @@ function BookingContent() {
           return (
             <div key={label} className="flex items-center gap-2">
               <div className={cn('flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
-                step === s ? 'bg-gold text-black' : step > s ? 'bg-gold/20 text-gold' : 'bg-white/5 text-white/40')}>
+                step === s ? 'bg-gold text-white' : step > s ? 'bg-gold/20 text-gold' : 'bg-gray-100 text-gray-400')}>
                 {step > s ? <Check size={12} /> : <span>{s}</span>}
                 <span className="hidden sm:inline">{label}</span>
               </div>
-              {i < 2 && <ChevronRight size={14} className="text-white/20" />}
+              {i < 2 && <ChevronRight size={14} className="text-gray-300" />}
             </div>
           );
         })}
@@ -93,7 +93,7 @@ function BookingContent() {
                 <button
                   onClick={() => setStep(2)}
                   disabled={!canProceedToStep2}
-                  className="mt-8 w-full py-3.5 bg-gold text-black font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
+                  className="mt-8 w-full py-3.5 bg-gold text-white font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
                 >
                   Continue to Date & Slot
                 </button>
@@ -104,7 +104,7 @@ function BookingContent() {
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                 <div className="glass-card p-6 mb-6">
-                  <label className="block text-sm font-semibold text-white/70 mb-3">Select Date</label>
+                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-3">Select Date</label>
                   <input
                     type="date"
                     min={minDate()}
@@ -115,7 +115,7 @@ function BookingContent() {
                 </div>
 
                 <div className="glass-card p-6 mb-6">
-                  <label className="block text-sm font-semibold text-white/70 mb-4">Select Time Slot</label>
+                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-4">Select Time Slot</label>
                   <div className="grid grid-cols-3 gap-4">
                     {timeSlots.map(slot => (
                       <button
@@ -123,25 +123,25 @@ function BookingContent() {
                         onClick={() => setSelectedSlot(slot.id as SlotType)}
                         className={cn('p-4 rounded-xl border text-center transition-all',
                           selectedSlot === slot.id
-                            ? 'border-gold bg-gold/10 shadow-lg shadow-gold/10'
-                            : 'border-white/10 bg-white/5 hover:border-gold/30')}
+                            ? 'border-gold bg-gold/5 shadow-sm shadow-gold/10'
+                            : 'border-[#EDE8DF] bg-white hover:border-gold/40')}
                       >
                         <div className="text-2xl mb-2">{slot.icon}</div>
-                        <div className={cn('font-bold text-sm', selectedSlot === slot.id ? 'text-gold' : 'text-white')}>{slot.label}</div>
-                        <div className="text-white/40 text-xs mt-1">{slot.time}</div>
+                        <div className={cn('font-bold text-sm', selectedSlot === slot.id ? 'text-gold' : 'text-[#1A1A1A]')}>{slot.label}</div>
+                        <div className="text-[#9C948E] text-xs mt-1">{slot.time}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <button onClick={() => setStep(1)} className="px-5 py-3 border border-white/10 text-white/60 rounded-xl hover:bg-white/5 transition-all text-sm">
+                  <button onClick={() => setStep(1)} className="px-5 py-3 border border-[#EDE8DF] text-[#6B6460] rounded-xl hover:bg-gray-50 transition-all text-sm">
                     Back
                   </button>
                   <button
                     onClick={() => setStep(3)}
                     disabled={!canProceedToStep3}
-                    className="flex-1 py-3.5 bg-gold text-black font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
+                    className="flex-1 py-3.5 bg-gold text-white font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
                   >
                     Continue to Guest Details
                   </button>
@@ -153,31 +153,31 @@ function BookingContent() {
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                 <div className="glass-card p-6 mb-6">
-                  <label className="block text-sm font-semibold text-white/70 mb-3">Number of Guests</label>
+                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-3">Number of Guests</label>
                   <div className="flex items-center gap-4">
                     <button onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
-                      className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all text-lg font-bold">−</button>
+                      className="w-10 h-10 rounded-lg bg-gray-50 border border-[#EDE8DF] text-[#1A1A1A] hover:bg-gray-100 transition-all text-lg font-bold">−</button>
                     <div className="flex-1 text-center">
                       <div className="text-3xl font-bold text-gold">{guestCount}</div>
-                      <div className="text-xs text-white/40 mt-0.5">
+                      <div className="text-xs text-[#9C948E] mt-0.5">
                         <Users size={10} className="inline mr-1" />guests
                         {selectedHall && guestCount > selectedHall.capacity && (
-                          <span className="text-red-400 ml-2">Exceeds capacity ({selectedHall.capacity})</span>
+                          <span className="text-red-500 ml-2">Exceeds capacity ({selectedHall.capacity})</span>
                         )}
                       </div>
                     </div>
                     <button onClick={() => setGuestCount(Math.min(selectedHall?.capacity || 50, guestCount + 1))}
-                      className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all text-lg font-bold">+</button>
+                      className="w-10 h-10 rounded-lg bg-gray-50 border border-[#EDE8DF] text-[#1A1A1A] hover:bg-gray-100 transition-all text-lg font-bold">+</button>
                   </div>
                   {selectedHall && (
-                    <p className="text-xs text-white/30 mt-3 flex items-center gap-1.5">
+                    <p className="text-xs text-[#9C948E] mt-3 flex items-center gap-1.5">
                       <Info size={10} /> Max capacity: {selectedHall.capacity} guests
                     </p>
                   )}
                 </div>
 
                 <div className="glass-card p-6 mb-6">
-                  <label className="block text-sm font-semibold text-white/70 mb-3">Special Requests <span className="text-white/30 font-normal">(optional)</span></label>
+                  <label className="block text-sm font-semibold text-[#1A1A1A] mb-3">Special Requests <span className="text-[#9C948E] font-normal">(optional)</span></label>
                   <textarea
                     value={specialRequests}
                     onChange={e => setSpecialRequests(e.target.value)}
@@ -188,13 +188,13 @@ function BookingContent() {
                 </div>
 
                 <div className="flex gap-3">
-                  <button onClick={() => setStep(2)} className="px-5 py-3 border border-white/10 text-white/60 rounded-xl hover:bg-white/5 transition-all text-sm">
+                  <button onClick={() => setStep(2)} className="px-5 py-3 border border-[#EDE8DF] text-[#6B6460] rounded-xl hover:bg-gray-50 transition-all text-sm">
                     Back
                   </button>
                   <button
                     onClick={handleProceedToMenu}
                     disabled={!selectedHall || (guestCount > (selectedHall?.capacity || 50))}
-                    className="flex-1 py-3.5 bg-gold text-black font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
+                    className="flex-1 py-3.5 bg-gold text-white font-bold rounded-xl disabled:opacity-40 hover:bg-gold/90 transition-all"
                   >
                     Proceed to Order Food →
                   </button>
@@ -206,16 +206,16 @@ function BookingContent() {
 
         {/* Sidebar Summary */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24">
+          <div className="sticky top-28">
             {selectedHall ? (
               <div className="glass-card overflow-hidden">
                 {/* 3D Room Preview */}
                 <div className="h-48 relative">
                   <RoomCanvas color="#C9A84C" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D2E12] to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
                   <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="font-bold text-white text-sm">{selectedHall.name}</h3>
-                    <p className="text-white/40 text-xs">{selectedHall.floor} · {selectedHall.area_sqft} sq.ft</p>
+                    <h3 className="font-bold text-white text-sm drop-shadow">{selectedHall.name}</h3>
+                    <p className="text-white/70 text-xs drop-shadow">{selectedHall.floor} · {selectedHall.area_sqft} sq.ft</p>
                   </div>
                 </div>
 
@@ -225,42 +225,42 @@ function BookingContent() {
                       <span key={a} className="px-2 py-0.5 bg-gold/10 text-gold text-[10px] rounded-full border border-gold/20">{a}</span>
                     ))}
                     {selectedHall.amenities.length > 4 && (
-                      <span className="px-2 py-0.5 bg-white/5 text-white/40 text-[10px] rounded-full">+{selectedHall.amenities.length - 4}</span>
+                      <span className="px-2 py-0.5 bg-gray-50 text-[#9C948E] text-[10px] rounded-full border border-[#EDE8DF]">+{selectedHall.amenities.length - 4}</span>
                     )}
                   </div>
 
-                  <div className="border-t border-white/5 pt-4 space-y-2.5">
+                  <div className="border-t border-[#EDE8DF] pt-4 space-y-2.5">
                     {selectedDate && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-white/40">Date</span>
-                        <span className="text-white font-medium">{new Date(selectedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="text-[#9C948E]">Date</span>
+                        <span className="text-[#1A1A1A] font-medium">{new Date(selectedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
                     )}
                     {selectedSlot && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-white/40">Slot</span>
-                        <span className="text-white font-medium">{timeSlots.find(s => s.id === selectedSlot)?.label} · {slotTime}</span>
+                        <span className="text-[#9C948E]">Slot</span>
+                        <span className="text-[#1A1A1A] font-medium">{timeSlots.find(s => s.id === selectedSlot)?.label} · {slotTime}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm">
-                      <span className="text-white/40">Guests</span>
-                      <span className="text-white font-medium">{guestCount} persons</span>
+                      <span className="text-[#9C948E]">Guests</span>
+                      <span className="text-[#1A1A1A] font-medium">{guestCount} persons</span>
                     </div>
                   </div>
 
-                  <div className="border-t border-white/5 pt-4">
+                  <div className="border-t border-[#EDE8DF] pt-4">
                     <div className="flex justify-between">
-                      <span className="text-white/60 text-sm">Hall charge</span>
+                      <span className="text-[#6B6460] text-sm">Hall charge</span>
                       <span className="text-gold font-bold">{formatCurrency(selectedHall.price_per_slot)}</span>
                     </div>
-                    <p className="text-white/25 text-xs mt-1">+ Food order total (next step)</p>
+                    <p className="text-[#9C948E] text-xs mt-1">+ Food order total (next step)</p>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="glass-card p-8 text-center">
                 <div className="text-4xl mb-4">🏛</div>
-                <p className="text-white/40 text-sm">Select a space to see details and pricing</p>
+                <p className="text-[#9C948E] text-sm">Select a space to see details and pricing</p>
               </div>
             )}
           </div>
@@ -276,16 +276,16 @@ function HallCard({ hall, selected, onSelect }: { hall: Hall; selected: boolean;
     <button
       onClick={onSelect}
       className={cn('glass-card text-left p-5 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]',
-        selected ? 'border-gold shadow-lg shadow-gold/10' : 'hover:border-gold/30')}
+        selected ? 'border-gold shadow-md shadow-gold/10' : 'hover:border-gold/40')}
     >
       <div className="flex items-center justify-between mb-3">
         <span className="text-3xl">{icons[hall.id]}</span>
         {selected && <Check size={16} className="text-gold" />}
       </div>
-      <h3 className={cn('font-bold mb-1 text-sm', selected ? 'text-gold' : 'text-white')}>{hall.name}</h3>
-      <p className="text-white/40 text-xs mb-3 line-clamp-2">{hall.description}</p>
+      <h3 className={cn('font-bold mb-1 text-sm', selected ? 'text-gold' : 'text-[#1A1A1A]')}>{hall.name}</h3>
+      <p className="text-[#9C948E] text-xs mb-3 line-clamp-2">{hall.description}</p>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-white/30"><Users size={10} className="inline mr-1" />Up to {hall.capacity}</span>
+        <span className="text-[#6B6460]"><Users size={10} className="inline mr-1" />Up to {hall.capacity}</span>
         <span className="text-gold font-bold">{formatCurrency(hall.price_per_slot)}/slot</span>
       </div>
     </button>

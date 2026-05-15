@@ -3,33 +3,33 @@
 @theme {
   --color-gold: #C9A84C;
   --color-gold-light: #E8D5A3;
-  --color-bg-primary: #071C0A;
-  --color-bg-secondary: #0D2E12;
-  --color-bg-card: #143A1A;
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #FBF8F3;
+  --color-bg-card: #FFFFFF;
+  --color-navy: #0D1F3C;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: #071C0A;
-  color: #F0EDE6;
+  background-color: #FFFFFF;
+  color: #1A1A1A;
   overflow-x: hidden;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #071C0A; }
+::-webkit-scrollbar-track { background: #FBF8F3; }
 ::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #E8D5A3; }
 
-/* ── Glass card ─────────────────────────────────────────────── */
+/* ── Glass card (now: white card with shadow) ────────────────── */
 .glass-card {
-  background: rgba(13, 46, 18, 0.70);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(201, 168, 76, 0.18);
+  background: #FFFFFF;
+  border: 1px solid #EDE8DF;
   border-radius: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* ── Gradient text ──────────────────────────────────────────── */
@@ -50,10 +50,10 @@ body {
 
 /* ── Inputs ─────────────────────────────────────────────────── */
 .premium-input {
-  background: rgba(13, 46, 18, 0.85);
-  border: 1px solid rgba(201, 168, 76, 0.22);
+  background: #FFFFFF;
+  border: 1px solid #EDE8DF;
   border-radius: 0.75rem;
-  color: #F0EDE6;
+  color: #1A1A1A;
   padding: 0.75rem 1rem;
   width: 100%;
   outline: none;
@@ -64,15 +64,15 @@ body {
   border-color: rgba(201, 168, 76, 0.65);
   box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.09);
 }
-.premium-input::placeholder { color: rgba(240, 237, 230, 0.3); }
-select.premium-input option { background: #0D2E12; color: #F0EDE6; }
+.premium-input::placeholder { color: #9C948E; }
+select.premium-input option { background: #FFFFFF; color: #1A1A1A; }
 
 /* ── Scrollbar hide ─────────────────────────────────────────── */
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* ── Date input dark ────────────────────────────────────────── */
-input[type="date"] { color-scheme: dark; }
+/* ── Date input light ───────────────────────────────────────── */
+input[type="date"] { color-scheme: light; }
 
 /* ── Line clamp ─────────────────────────────────────────────── */
 .line-clamp-2 {

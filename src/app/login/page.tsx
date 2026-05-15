@@ -5,9 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import dynamic from 'next/dynamic';
-
-const HeroScene = dynamic(() => import('@/components/3d/HeroScene'), { ssr: false });
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -63,20 +60,20 @@ function LoginForm() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="text-4xl font-bold mb-2">
-            <span className="text-gold">UN</span><span className="text-white">WIND</span>
+            <span className="text-gold">UN</span><span className="text-[#1A1A1A]">WIND</span>
           </div>
-          <p className="text-white/40 text-sm">Madurai's Premier Private Dining Experience</p>
+          <p className="text-[#6B6460] text-sm">Madurai's Premier Private Dining Experience</p>
         </div>
 
-        <div className="border-t border-white/5 pt-8 mb-6">
-          <h2 className="text-xl font-bold text-white text-center mb-1">Welcome Back</h2>
-          <p className="text-white/40 text-sm text-center mb-8">Sign in to book your exclusive space</p>
+        <div className="border-t border-[#EDE8DF] pt-8 mb-6">
+          <h2 className="text-xl font-bold text-[#1A1A1A] text-center mb-1">Welcome Back</h2>
+          <p className="text-[#6B6460] text-sm text-center mb-8">Sign in to book your exclusive space</p>
 
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-5 py-3.5 bg-white text-gray-800 font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg shadow-black/20 disabled:opacity-60 mb-3"
+            className="w-full flex items-center justify-center gap-3 px-5 py-3.5 bg-white border border-[#EDE8DF] text-gray-800 font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-sm disabled:opacity-60 mb-3"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin text-gray-500" />
@@ -93,9 +90,9 @@ function LoginForm() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-4">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-white/30 text-xs">or</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-[#EDE8DF]" />
+            <span className="text-[#9C948E] text-xs">or</span>
+            <div className="flex-1 h-px bg-[#EDE8DF]" />
           </div>
 
           {/* Demo Sign In */}
@@ -109,15 +106,15 @@ function LoginForm() {
           </button>
         </div>
 
-        <p className="text-center text-white/20 text-xs mt-6 leading-relaxed">
+        <p className="text-center text-[#9C948E] text-xs mt-6 leading-relaxed">
           By signing in, you agree to our{' '}
-          <span className="text-gold/40">Terms of Service</span> and{' '}
-          <span className="text-gold/40">Privacy Policy</span>
+          <span className="text-gold/70">Terms of Service</span> and{' '}
+          <span className="text-gold/70">Privacy Policy</span>
         </p>
       </div>
 
       {/* Trust indicators */}
-      <div className="flex items-center justify-center gap-6 mt-6 text-xs text-white/25">
+      <div className="flex items-center justify-center gap-6 mt-6 text-xs text-[#9C948E]">
         <span>🔒 Secure Login</span>
         <span>✅ No spam</span>
         <span>🏛 Madurai&apos;s #1</span>
@@ -128,12 +125,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* 3D Background */}
-      <div className="absolute inset-0 z-0 opacity-50">
-        <HeroScene />
-      </div>
-      <div className="absolute inset-0 z-10 bg-gradient-to-br from-[#071C0A]/90 via-[#071C0A]/70 to-[#071C0A]/90" />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#FBF8F3]">
+      {/* Soft warm background pattern */}
+      <div className="absolute inset-0 z-0 opacity-30" style={{
+        backgroundImage: 'radial-gradient(circle at 30% 20%, #C9A84C22 0%, transparent 50%), radial-gradient(circle at 70% 80%, #C9A84C11 0%, transparent 50%)',
+      }} />
 
       {/* Suspense wraps useSearchParams */}
       <Suspense fallback={
