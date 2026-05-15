@@ -271,22 +271,34 @@ function BookingContent() {
 }
 
 function HallCard({ hall, selected, onSelect }: { hall: Hall; selected: boolean; onSelect: () => void }) {
-  const icons: Record<string, string> = { 'royal-hall': '🏛', 'garden-suite': '🌿', 'crystal-room': '💎', 'heritage-lounge': '🏺' };
   return (
     <button
       onClick={onSelect}
-      className={cn('glass-card text-left p-5 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]',
+      className={cn('glass-card text-left overflow-hidden transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]',
         selected ? 'border-gold shadow-md shadow-gold/10' : 'hover:border-gold/40')}
     >
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-3xl">{icons[hall.id]}</span>
-        {selected && <Check size={16} className="text-gold" />}
+      {/* Hall photo */}
+      <div className="relative h-36 overflow-hidden">
+        <img
+          src={hall.images[0]}
+          alt={hall.name}
+          className="w-full h-full object-cover transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        {selected && (
+          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gold flex items-center justify-center">
+            <Check size={12} className="text-white" />
+          </div>
+        )}
+        <span className="absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 bg-gold text-white rounded-full">{hall.floor}</span>
       </div>
-      <h3 className={cn('font-bold mb-1 text-sm', selected ? 'text-gold' : 'text-[#1A1A1A]')}>{hall.name}</h3>
-      <p className="text-[#9C948E] text-xs mb-3 line-clamp-2">{hall.description}</p>
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-[#6B6460]"><Users size={10} className="inline mr-1" />Up to {hall.capacity}</span>
-        <span className="text-gold font-bold">{formatCurrency(hall.price_per_slot)}/slot</span>
+      <div className="p-4">
+        <h3 className={cn('font-bold mb-1 text-sm', selected ? 'text-gold' : 'text-[#1A1A1A]')}>{hall.name}</h3>
+        <p className="text-[#9C948E] text-xs mb-3 line-clamp-2">{hall.description}</p>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-[#6B6460]"><Users size={10} className="inline mr-1" />Up to {hall.capacity}</span>
+          <span className="text-gold font-bold">{formatCurrency(hall.price_per_slot)}/slot</span>
+        </div>
       </div>
     </button>
   );

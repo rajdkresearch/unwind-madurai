@@ -1,14 +1,11 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, MapPin, Star, Users, Clock, ChevronDown, Sparkles } from 'lucide-react';
 import { halls } from '@/lib/data/halls';
 import { restaurants } from '@/lib/data/restaurants';
 import { formatCurrency } from '@/lib/utils';
-
-const HeroScene = dynamic(() => import('@/components/3d/HeroScene'), { ssr: false, loading: () => <div className="w-full h-full bg-transparent" /> });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fadeUp: any = {
@@ -21,14 +18,16 @@ export default function HomePage() {
     <div className="relative">
       {/* ─── HERO ─── */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
-        {/* 3D Background */}
-        <div className="absolute inset-0 z-0">
-          <HeroScene />
-        </div>
+        {/* Full-bleed food photography background */}
+        <img
+          src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&q=90&auto=format&fit=crop"
+          alt="Elegant dining"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
 
-        {/* Warm food-photo gradient overlays */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-[#1A0A05]/85 via-[#8B3A18]/60 to-[#C4712A]/30" />
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#1A0A05]/80 via-transparent to-[#1A0A05]/40" />
+        {/* Gradient overlays for text readability */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/70 via-black/50 to-black/80" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/60 via-transparent to-black/30" />
 
         {/* Hero Content */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-32 pb-16">
@@ -145,18 +144,18 @@ export default function HomePage() {
               >
                 <Link href={`/book?hall=${hall.id}`}
                   className="group block glass-card overflow-hidden hover:border-gold/40 hover:shadow-lg transition-all duration-300">
-                  {/* Image placeholder with gradient */}
-                  <div className="h-44 relative overflow-hidden bg-gradient-to-br from-[#FBF8F3] to-[#EDE8DF]">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-6xl opacity-40">
-                        {hall.id === 'royal-hall' ? '🏛' : hall.id === 'garden-suite' ? '🌿' : hall.id === 'crystal-room' ? '💎' : '🏺'}
-                      </div>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+                  {/* Hall photo */}
+                  <div className="h-44 relative overflow-hidden">
+                    <img
+                      src={hall.images[0]}
+                      alt={hall.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="absolute top-3 left-3">
                       <span className="px-2 py-0.5 bg-gold text-white text-[10px] font-bold rounded-full">{hall.floor}</span>
                     </div>
-                    <div className="absolute bottom-3 right-3 text-xs text-[#6B6460]">
+                    <div className="absolute bottom-3 right-3 text-xs text-white/90 font-medium drop-shadow">
                       <Users size={10} className="inline mr-1" />{hall.capacity} guests
                     </div>
                   </div>
